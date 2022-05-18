@@ -9,4 +9,4 @@ from data samples selected by the South Pole Telescope (SPT).
 ## Main List of Questions
 - 1. Which observable (mass proximity) has the lowest scattering within our measurements?
 - 2. Is MuStar robust against systematic effects (miscentering, projection, & orientation)?
-- 3. Does the inclusion and analysis of blue-shifted galaxies help decrease scattering within our measurements?
+- 3. Does the inclusion and analysis of blue-cloud galaxies help decrease scattering within our measurements?
