@@ -1,7 +1,7 @@
 # MuStar Summer Project 
 
 ## Description
-This is a summer project that I am working on with gradute student Johnny Esteves 
+This is a summer project that I am working on with graduate student Johnny Esteves 
 at the University of Michigan within the group organized by Professor Marcelle Soares-Santos 
 ## Main Goal
 In short, the goal of the project is to define the scalar mass relations between MuStar and the masses of galaxy clusters
