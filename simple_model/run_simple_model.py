@@ -176,19 +176,37 @@ def logNormal_variance(mu,std):
     # return the likeihood times the prior (log likelihood plus the log prior)
 #    return lp + log_likelihood_simple(theta, indices, eps=1e-9)
 
-def logposterior(theta, indices):
+#def logposterior(theta, indices):
     ## OUTPUT (RETURN VALUES) STILL NEEDS TO BE CHANGED ## OR CHANGED TO THE SPT_MODEL VERSION
+#    lp = logprior(theta)
+    
+    # if the prior is not finite return a probability of zero (log probability of -inf)
+#    if not np.isfinite(lp):
+#        return -np.inf, -np.inf
+#    ll = lp + log_likelihood_simple(theta, indices, eps=1e-9)
+#    if not np.isfinite(ll):
+#        return lp, -np.inf
+#    return lp + ll, lp
+    # return the likeihood times the prior (log likelihood plus the log prior)
+
+#def logposterior(theta, indices):
+#    lp = logprior(theta)
+#    if not np.isfinite(lp):
+#        return -np.inf, -np.inf
+#    ll = log_likelihood_simple(theta, indices, eps=1e-9)# + lp
+#    if not np.isfinite(ll):
+#        return lp, -np.inf
+#    return lp + ll, lp
+
+def logposterior(theta, indices):
     lp = logprior(theta)
     
     # if the prior is not finite return a probability of zero (log probability of -inf)
     if not np.isfinite(lp):
-        return -np.inf, -np.inf
-    ll = lp + log_likelihood_simple(theta, indices, eps=1e-9)
-    if not np.isfinite(ll):
-        return lp, -np.inf
-    return lp + ll, lp
+        return -np.inf
+    
     # return the likeihood times the prior (log likelihood plus the log prior)
-    return lo, lp
+    return lp + log_likelihood_simple(theta, indices, eps=1e-9)
 
 def E(z):
     # The Hubble constant at the value of z
@@ -280,11 +298,12 @@ print('filename:',filename)
 infile = 'fake_data_Jul4.csv'
 
 ### Grid Setting
-Nzeta = 75
+Nzeta = 75 #Previously 125
 Nlbd = 150
-Nmass = 100
+Nmass = 100 #Previously 125
 Nz = 100
 alpha = 0.0001
+## THE CHANGES IN THE GRID SETTINGS ABOVE HELPED OBTAIN THE CORRECT VALUES ##
 
 ### MCMC Setup
 theta_true = [5.24, 1.534, 0.465, 0.161, 76.9, 1.02, 0.29, 0.16, 0.8]
@@ -357,8 +376,8 @@ if quick_fit:
     initial = theta_true + 0.05 * np.random.randn(9)
     soln = minimize(nll, initial, args=indices)
     end = time.time()
-    spt_time = end - start
-    print("Simple Model took {0:.1f} seconds".format(spt_time))
+    sp_time = end - start
+    print("Simple Model took {0:.1f} seconds".format(sp_time))
 
     albd, blbd, clbd, slbd, rho = soln.x[4:]
 
@@ -378,7 +397,7 @@ if run_mcmc:
     end = time.time()
     sp_mcmc_time = end - start
     print("Simple Model took {0:.1f} seconds".format(sp_mcmc_time))
-    print("It is {} slower than the very simple model".format(sp_mcmc_time/vsp_mcmc_time))
+    #print("It is {} slower than the very simple model".format(sp_mcmc_time/vsp_mcmc_time))
     
     flat_samples = sampler.flatchain
     fig, axes = plt.subplots(ndims, figsize=(10, 7), sharex=True)
@@ -387,7 +406,7 @@ if run_mcmc:
         ax = axes[i]
         ax.plot(samples[:, i], "k", alpha=0.3)
         ax.set_xlim(0, len(samples))
-        ax.set_ylabel(labels[i])
+        #ax.set_ylabel(labels[i])
         ax.yaxis.set_label_coords(-0.1, 0.5)
     axes[-1].set_xlabel("step number");
     

@@ -262,7 +262,7 @@ def header():
 header()
 #### Parameter to set
 debug = False
-run_mcmc = False
+run_mcmc = True
 quick_fit = False
 
 ### Parameter to name it
@@ -273,11 +273,12 @@ print('filename:',filename)
 infile = 'fake_data_Jul4.csv'
 
 ### Grid Setting
-Nzeta = 75
+Nzeta = 75 #Previously 125
 Nlbd = 150
-Nmass = 100
+Nmass = 100 #Previously 125
 Nz = 100
 alpha = 0.0001
+## THE CHANGES IN THE GRID SETTINGS ABOVE HELPED OBTAIN THE CORRECT VALUES ##
 
 ### MCMC Setup
 theta_true = [5.24, 1.534, 0.465, 0.161, 76.9, 1.02, 0.29, 0.16, 0.8]
@@ -377,8 +378,8 @@ if run_mcmc:
     end = time.time()
     spt_mcmc_time = end - start
     print("SPT Model took {0:.1f} seconds".format(spt_mcmc_time))
-    print("It is {} slower than the very simple model".format(spt_mcmc_time/vsp_mcmc_time))
-    print("It is {} slower than the simple model".format(spt_mcmc_time/sp_mcmc_time))
+    #print("It is {} slower than the very simple model".format(spt_mcmc_time/vsp_mcmc_time))
+    #print("It is {} slower than the simple model".format(spt_mcmc_time/sp_mcmc_time))
     
     flat_samples = sampler.flatchain
     fig, axes = plt.subplots(ndims, figsize=(10, 7), sharex=True)
