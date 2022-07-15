@@ -44,6 +44,7 @@ def log_likelihood_simple(theta, indices, eps=1e-9):
     probs = []
     for ix in indices:
         probs.append(_likelihood_simple(theta, ix))
+        break
     
     # missing a normalization factor
     p = np.array(probs)
@@ -60,33 +61,50 @@ def _likelihood_simple(theta, ix):
     # calling the indepedent variables
     # there are defined as global variables
     mass_i = mass[ix]
+    print("This is mass_i:", mass_i)
     redshift_i = redshift[ix]
+    print("This is redshift_i:", redshift_i)
     p_chisi = prob_chisi_vec[ix]
+    print("This is p_chisi:", p_chisi)
     p_lbd_hat = prob_lbd_hat_vec[ix]
+    print("This is p_lbd_hat:", p_lbd_hat)
     
     # take the indices with non zero values for P_chisi, P_lbd_hat
     # this approx. makes the code to run faster by a factor 10
     llo, lup = list(lbd_indices_vec[ix])
+    print("This is llo, lup:", llo, lup)
     #llo, lup = 0, len(lbdvec)
     clo, cup = list(zeta_indices_vec[ix])
+    print("This is clo, cup:", clo, cup)
     
     # calling predictions;
     ln_lbd_pred = ln_lbd_given_M([A_lambda, B_lambda, C_lambda, scatter_lambda], mass_i, redshift_i)
+    print("This is ln_lbd_pred:", ln_lbd_pred)
     ln_zeta_pred= ln_zeta_given_M([A_sze, B_sze, C_sze, scatter_sze], mass_i, redshift_i)
+    print("This is ln_zeta_pred:", ln_zeta_pred)
+    
     
     # the logNormal Distribution
     lp_lbd_zeta = compute_log_pLbdZeta(ll[clo:cup,llo:lup], zz[clo:cup,llo:lup],
                                       scatter_lambda, scatter_sze, rho,
                                       ln_lbd_pred, ln_zeta_pred)
+    print("This is lp_lbd_zeta:", lp_lbd_zeta)
+    
     p_lbd_zeta = np.exp(lp_lbd_zeta)
+    print("This is p_lbd_zeta:", p_lbd_zeta)
     
     # integrate over zeta
     p_chisi = np.tile(p_chisi[clo:cup], (int(lup-llo), 1)).T
+    print("This is p_chisi after integration over zeta:", p_chisi)
     p_lbd = np.trapz(p_lbd_zeta*p_chisi, x=zetavec[clo:cup], axis=0)
+    print("This is p_lbd after integration over zeta:", p_lbd)
     
     # integrate over lambda
     norm = np.trapz(p_lbd, x=lbdvec[llo:lup])
+    print("This is the normal after integration over lambda:", norm)
     p = np.trapz(p_lbd*p_lbd_hat[llo:lup], x=lbdvec[llo:lup], axis=0)
+    print("This is the probability after intergration over lambda:", p)
+    print("This is the final result:", p/norm)
     return p/norm
 
 ###############################################################################
@@ -188,8 +206,8 @@ def logNormal_variance(mu,std):
 #        return lp, -np.inf
 #    return lp + ll, lp
     # return the likeihood times the prior (log likelihood plus the log prior)
-
-#def logposterior(theta, indices):
+    
+#def logposterior(theta):
 #    lp = logprior(theta)
 #    if not np.isfinite(lp):
 #        return -np.inf, -np.inf
@@ -241,32 +259,46 @@ def compute_log_pLbdZeta(Lambda, Zeta, scatter_lambda, scatter_sze, rho,
                          ln_lbd_pred, ln_zeta_pred, eps = 1e-9):
     # converting std to normal distribution
     s_zeta = scatter_sze
+    print("This is s_zeta:", s_zeta)
     s_lambda = scatter_lambda
+    print("This is s_lambda:", s_lambda)
     s_lambda_inv = np.where(s_lambda<=eps, np.inf, 1/s_lambda)
+    print("This is s_lambda_inv:", s_lambda_inv)
     s_zeta_inv = np.where(s_zeta<=eps, np.inf, 1/s_zeta)
+    print("This is s_zeta_inv:", s_zeta_inv)
     
     # avoid error messages
     rho2 = (1-rho**2)
+    print("This is rho2:", rho2)
     rho_inv = np.where(rho2<=eps, np.inf, 1/rho2)
+    print("This is rho_inv:", rho_inv)
     
     cov2 = (s_lambda)**(2)*(s_zeta)**(2)*rho2
+    print("This is cov2:", cov2)
     additional_cov = (-0.5)*np.log(np.pi*cov2)
+    print("This is additional_cov:", additional_cov)
         
     lbd_std = (np.log(Lambda) - ln_lbd_pred)*s_lambda_inv
+    print("This is lbd_std:", lbd_std)
     zeta_std = (np.log(Zeta) - ln_zeta_pred)*s_zeta_inv
+    print("This is zeta_std:", zeta_std)
     #np.seterr(invalid='ignore')
 
     # lbd_likelihood
     lp_lbd  = (-rho_inv*lbd_std**2)/2.
+    print("This is lp_lbd:", lp_lbd)
 
     # zeta likelihood
     lp_zeta = (-rho_inv*zeta_std**2)/2.
+    print("This is lp_zeta:", lp_zeta)
 
     # corr likelihod
     lp_corr = rho*rho_inv*lbd_std*zeta_std
+    print("This is lp_corr:", lp_corr)
     
     # total likelihood
     lp_total_m = lp_lbd + lp_zeta + lp_corr + additional_cov
+    print("This is lp_total_m:", lp_total_m)
     
     return lp_total_m
 
@@ -286,9 +318,9 @@ def header():
 ###############################################################################
 header()
 #### Parameter to set
-debug = False
+debug = True
 run_mcmc = False
-quick_fit = True
+quick_fit = False
 
 ### Parameter to name it
 runname = "test"
@@ -298,9 +330,9 @@ print('filename:',filename)
 infile = 'fake_data_Jul4.csv'
 
 ### Grid Setting
-Nzeta = 75 #Previously 125
+Nzeta = 75 #125
 Nlbd = 150
-Nmass = 100 #Previously 125
+Nmass = 100 #125
 Nz = 100
 alpha = 0.0001
 ## THE CHANGES IN THE GRID SETTINGS ABOVE HELPED OBTAIN THE CORRECT VALUES ##
@@ -368,6 +400,13 @@ if debug:
     indices = np.arange(len(mass))
     print('Test LogPosterior')
     print(logposterior(theta_true, indices))
+    
+if debug:
+    guess = (np.array(theta_true)[:, np.newaxis]*(1.+0.01*np.random.normal(size=(ndims,walkers)))).T
+    sel = np.arange(len(redshift))#[:100]
+    sel = np.random.randint(len(redshift), size=100, dtype=int)
+    argslist = [sel]
+    logposterior(theta_true, sel)
 
 if quick_fit:
     start = time.time()
@@ -387,6 +426,29 @@ if quick_fit:
     print("Clbd = {0:.3f}".format(clbd))
     print("Scatter_lbd = {0:.3f}".format(slbd))
     print("rho: {0:.3f}".format(rho))
+    
+    initial = theta_true + 0.1 * np.random.randn(9)
+    logposterior(initial,indices)
+    
+    ## plotting this results
+    t0 = time.time()
+    np.random.seed(42)
+    lps = [-1.*logposterior(theta_true,indices)]
+    dist = [0.]
+    # increase the quick from the truth
+    for i in [1.,2.5,5.,7.5,10.,15.,20.,25.,30.,60]:
+        initial = theta_true + (i/100.) * np.random.randn(9)
+        #print(1-np.array(initial)/np.array(theta_true))
+        nDist = np.linalg.norm(np.array(theta_true)-np.array(initial))
+        lps.append(-1.*logposterior(initial,indices))
+        dist.append(nDist)
+        
+    print("lps:", lps)
+    
+    plt.scatter(dist,np.array(lps)-np.min(lps)+1.)
+    plt.ylabel('LogLikelihood - Min')
+    plt.xlabel(r'|$\theta-\theta_{random}$|')
+    plt.yscale('log')
 
 ## Put the new changes here
 if run_mcmc:
