@@ -13,7 +13,6 @@ from astropy.table import Table
 from astropy.cosmology import WMAP9 as cosmo
 from colossus.cosmology import cosmology
 from colossus.lss import mass_function
-from scipy import interpolate
 from multiprocessing import Pool
 cosmology.setCosmology('WMAP9')
 
@@ -38,65 +37,62 @@ cosmology.setCosmology('WMAP9')
 ################################### Likelihood ################################
 ###############################################################################
 
-def log_likelihood(theta, indices, eps=1e-9):
+def log_likelihood_simple(theta, indices, eps=1e-9):
+    # for each cluster compute the log_likelihood
+    
     # defining variables
     probs = []
     for ix in indices:
-        probs.append(_likelihood(theta, ix))
+        probs.append(_likelihood_simple(theta, ix))
         break
-    p = np.array(probs)#/np.sum(probs)
+    
+    # missing a normalization factor
+    p = np.array(probs)
     log_p = np.log(p)
     log_p = np.where(np.isnan(log_p), -np.inf, log_p)
     return np.sum(log_p)
 
-def _likelihood(theta, ix):
+def _likelihood_simple(theta, ix):
     # unfolding theta
     A_lambda, B_lambda, C_lambda, scatter_lambda = theta[4:8]
     A_sze, B_sze, C_sze, scatter_sze = theta[:4]
     rho = theta[-1]
     
-    # forgot the mass
+    # calling the indepedent variables
+    # there are defined as global variables
+    mass_i = mass[ix]
+    print("This is mass_i:", mass_i)
     redshift_i = redshift[ix]
     print("This is redshift_i:", redshift_i)
     p_chisi = prob_chisi_vec[ix]
     print("This is p_chisi:", p_chisi)
     p_lbd_hat = prob_lbd_hat_vec[ix]
     print("This is p_lbd_hat:", p_lbd_hat)
-    #p_lbd_hat_conv = prob_lbd_hat_conv[ix]
+    
+    # take the indices with non zero values for P_chisi, P_lbd_hat
+    # this approx. makes the code to run faster by a factor 10
     llo, lup = list(lbd_indices_vec[ix])
     print("This is llo, lup:", llo, lup)
-    #llo, lup = 0, len(lbdvec)#list(lbd_indices_vec[ix])
+    #llo, lup = 0, len(lbdvec)
     clo, cup = list(zeta_indices_vec[ix])
     print("This is clo, cup:", clo, cup)
     
     # calling predictions;
-    ln_lbd_pred = ln_lbd_given_M([A_lambda, B_lambda, C_lambda, scatter_lambda], mvec, redshift_i)
+    ln_lbd_pred = ln_lbd_given_M([A_lambda, B_lambda, C_lambda, scatter_lambda], mass_i, redshift_i)
     print("This is ln_lbd_pred:", ln_lbd_pred)
-    ln_zeta_pred= ln_zeta_given_M([A_sze, B_sze, C_sze, scatter_sze], mvec, redshift_i)
+    ln_zeta_pred= ln_zeta_given_M([A_sze, B_sze, C_sze, scatter_sze], mass_i, redshift_i)
     print("This is ln_zeta_pred:", ln_zeta_pred)
-    halo_mass_func = halo_mass_function2(redshift_i)
-    print("This is halo_mass_func:", halo_mass_func)
     
-    ln_lbd_pred = ln_lbd_pred[:,np.newaxis,np.newaxis]
-    #print("This is ln_lbd_pred in grid:", ln_lbd_pred)
-    ln_zeta_pred= ln_zeta_pred[:,np.newaxis,np.newaxis]
-    #print("This is ln_zeta_pred in grid:", ln_zeta_pred)
-    hmf = halo_mass_func[:,np.newaxis,np.newaxis]
-    #print("This is hmf:", hmf)
     
     # the logNormal Distribution
-    lp_lbd_zeta = compute_log_pLbdZeta(ll[:,clo:cup,llo:lup], zz[:,clo:cup,llo:lup],
+    lp_lbd_zeta = compute_log_pLbdZeta(ll[clo:cup,llo:lup], zz[clo:cup,llo:lup],
                                       scatter_lambda, scatter_sze, rho,
                                       ln_lbd_pred, ln_zeta_pred)
     print("This is lp_lbd_zeta:", lp_lbd_zeta)
-    dN_lbd_zeta = np.exp(lp_lbd_zeta)
-    print("This is dN_lbd_zeta:", dN_lbd_zeta)
     
-    # integrate over M
-    #norm = float(norm_function(redshift_i))
-    p_lbd_zeta = np.trapz(dN_lbd_zeta*hmf, x=mvec, axis=0)#/norm
+    p_lbd_zeta = np.exp(lp_lbd_zeta)
     print("This is p_lbd_zeta:", p_lbd_zeta)
-
+    
     # integrate over zeta
     p_chisi = np.tile(p_chisi[clo:cup], (int(lup-llo), 1)).T
     print("This is p_chisi after integration over zeta:", p_chisi)
@@ -114,11 +110,6 @@ def _likelihood(theta, ix):
 ###############################################################################
 ################################### Prior #####################################
 ###############################################################################
-
-def _halo_mass_function(M, z):
-    return mass_function.massFunction(M, z, mdef = '500c', model = 'bocquet16')
-
-halo_mass_function = np.vectorize(_halo_mass_function)
 
 SZ_Priors = {'A_sze':[5.24, 0.85], 'B_sze':[1.534, 0.100],'C_sze':[0.465, 0.407],
              'scatter_sze':[0.161, 0.080]}
@@ -193,6 +184,38 @@ def logNormal_variance(mu,std):
     return (np.exp(std**2)-1)*np.exp(2*mu+std**2)
 
 # change posterior
+#def logposterior(theta, indices):
+#    lp = logprior(theta)
+#    
+    # if the prior is not finite return a probability of zero (log probability of -inf)
+#    if not np.isfinite(lp):
+#        return -np.inf
+    
+    # return the likeihood times the prior (log likelihood plus the log prior)
+#    return lp + log_likelihood_simple(theta, indices, eps=1e-9)
+
+#def logposterior(theta, indices):
+    ## OUTPUT (RETURN VALUES) STILL NEEDS TO BE CHANGED ## OR CHANGED TO THE SPT_MODEL VERSION
+#    lp = logprior(theta)
+    
+    # if the prior is not finite return a probability of zero (log probability of -inf)
+#    if not np.isfinite(lp):
+#        return -np.inf, -np.inf
+#    ll = lp + log_likelihood_simple(theta, indices, eps=1e-9)
+#    if not np.isfinite(ll):
+#        return lp, -np.inf
+#    return lp + ll, lp
+    # return the likeihood times the prior (log likelihood plus the log prior)
+    
+#def logposterior(theta):
+#    lp = logprior(theta)
+#    if not np.isfinite(lp):
+#        return -np.inf, -np.inf
+#    ll = log_likelihood_simple(theta, indices, eps=1e-9)# + lp
+#    if not np.isfinite(ll):
+#        return lp, -np.inf
+#    return lp + ll, lp
+
 def logposterior(theta, indices):
     lp = logprior(theta)
     
@@ -201,7 +224,7 @@ def logposterior(theta, indices):
         return -np.inf
     
     # return the likeihood times the prior (log likelihood plus the log prior)
-    return lp + log_likelihood(theta, indices, eps=1e-9)
+    return lp + log_likelihood_simple(theta, indices, eps=1e-9)
 
 def E(z):
     # The Hubble constant at the value of z
@@ -307,9 +330,9 @@ print('filename:',filename)
 infile = 'fake_data_Jul4.csv'
 
 ### Grid Setting
-Nzeta = 75 #Previously 125
+Nzeta = 75 #125
 Nlbd = 150
-Nmass = 100 #Previously 125
+Nmass = 100 #125
 Nz = 100
 alpha = 0.0001
 ## THE CHANGES IN THE GRID SETTINGS ABOVE HELPED OBTAIN THE CORRECT VALUES ##
@@ -348,14 +371,11 @@ lbdvec = np.linspace(0.8*np.min(np.array(df['lambda'])), 1.2*np.max(np.array(df[
 zetavec = np.linspace(1.5, 1.2*np.max(np.array(df['zeta'])), Nzeta)
 
 # additional variables
-mm, zz, ll = np.meshgrid(mvec, zetavec, lbdvec, indexing='ij')
-step = np.where(lbdvec>=40, 1., 0.)
-dzt = np.diff(zetavec)[0]
-dld = np.diff(lbdvec)[0]
-zz2, mm2 = np.meshgrid(zvec, mvec)
-halo_mass_function2 = interpolate.interp1d(zvec, halo_mass_function(mm2, zz2), kind='cubic')
-norm_function = interpolate.interp1d(zvec, np.trapz(halo_mass_function(mm2, zz2), x=mvec, axis=0), kind='cubic')
+zz, ll = np.meshgrid(zetavec, lbdvec, indexing='ij')
+step = np.where(lbdvec>40.,1.,0.)
 indices = np.arange(len(mass))
+theta_true = [5.24, 1.534, 0.465, 0.161, 76.9, 1.02, 0.29, 0.16, 0.8]
+initial = theta_true + 0.1 * np.random.randn(9)
 
 if debug:
     print('Vector size')
@@ -388,9 +408,6 @@ if debug:
     argslist = [sel]
     logposterior(theta_true, sel)
 
-# given: mvec, lbdvec and zetavec
-# grid of lambda and zeta values to be intregated over
-
 if quick_fit:
     start = time.time()
     np.random.seed(42)
@@ -398,8 +415,8 @@ if quick_fit:
     initial = theta_true + 0.05 * np.random.randn(9)
     soln = minimize(nll, initial, args=indices)
     end = time.time()
-    spt_time = end - start
-    print("Model took {0:.1f} seconds".format(spt_time))
+    sp_time = end - start
+    print("Simple Model took {0:.1f} seconds".format(sp_time))
 
     albd, blbd, clbd, slbd, rho = soln.x[4:]
 
@@ -410,10 +427,10 @@ if quick_fit:
     print("Scatter_lbd = {0:.3f}".format(slbd))
     print("rho: {0:.3f}".format(rho))
     
-    theta_true = [5.24, 1.534, 0.465, 0.161, 76.9, 1.02, 0.29, 0.16, 0.8]
-    # a quick of 10% from the truth
     initial = theta_true + 0.1 * np.random.randn(9)
-    log_likelihood(initial,indices)
+    logposterior(initial,indices)
+    
+    ## plotting this results
     t0 = time.time()
     np.random.seed(42)
     lps = [-1.*logposterior(theta_true,indices)]
@@ -421,6 +438,7 @@ if quick_fit:
     # increase the quick from the truth
     for i in [1.,2.5,5.,7.5,10.,15.,20.,25.,30.,60]:
         initial = theta_true + (i/100.) * np.random.randn(9)
+        #print(1-np.array(initial)/np.array(theta_true))
         nDist = np.linalg.norm(np.array(theta_true)-np.array(initial))
         lps.append(-1.*logposterior(initial,indices))
         dist.append(nDist)
@@ -434,15 +452,14 @@ if quick_fit:
 
 ## Put the new changes here
 if run_mcmc:
-    pool = Pool(processes=40)              # start 40 worker processes
+    pool = Pool(processes=40)              # start 64 worker processes
     sampler = emcee.EnsembleSampler(walkers, ndims, logposterior, args=[np.arange(len(mass))], pool=pool)
     start = time.time()
     sampler.run_mcmc(guess, Nsamples+Nburnin)
     end = time.time()
-    spt_mcmc_time = end - start
-    print("SPT Model took {0:.1f} seconds".format(spt_mcmc_time))
-    #print("It is {} slower than the very simple model".format(spt_mcmc_time/vsp_mcmc_time))
-    #print("It is {} slower than the simple model".format(spt_mcmc_time/sp_mcmc_time))
+    sp_mcmc_time = end - start
+    print("Simple Model took {0:.1f} seconds".format(sp_mcmc_time))
+    #print("It is {} slower than the very simple model".format(sp_mcmc_time/vsp_mcmc_time))
     
     flat_samples = sampler.flatchain
     fig, axes = plt.subplots(ndims, figsize=(10, 7), sharex=True)

@@ -71,6 +71,7 @@ def _likelihood_simple(theta, ix):
     
     # take the indices with non zero values for P_chisi, P_lbd_hat
     # this approx. makes the code to run faster by a factor 10
+    # is this approximation false or true?
     llo, lup = list(lbd_indices_vec[ix])
     print("This is llo, lup:", llo, lup)
     #llo, lup = 0, len(lbdvec)
@@ -139,7 +140,7 @@ def set_prior_sze(theta_values):
         lp += np.where(np.abs(result)>9., -np.inf, result)
         # outside a range of six sigmas (six standard deviations)
     # set prior to 1 (log prior to 0) if in the range and zero (-inf) outside the range
-    lp = 0. if (theta_values[-1] > 0) else -np.inf
+    lp += 0. if (theta_values[-1] > 0) else -np.inf
     return lp
 
 # Setting Lambda priors
@@ -156,7 +157,7 @@ def set_prior_lambda(theta_values):
         # outside a range of six sigmas (six standard deviations)
        
     # set prior to 1 (log prior to 0) if in the range and zero (-inf) outside the range
-    lp = 0. if (theta_values[-1] > 0) else -np.inf
+    lp += 0. if (theta_values[-1] > 0) else -np.inf
     return lp
 
 def logprior(theta):
