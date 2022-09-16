@@ -293,19 +293,19 @@ header()
 debug = False
 run_mcmc = True
 quick_fit = True
-is_real_data = False
+is_real_data = True
 
 ### Parameter to name it
-runname = "simple_model"
-version = '0'
-filename = "{}_{:02d}".format(runname, version)
+runname = "sept_15"
+# Name should indicate a) fake or real data b) the month and day of the run
+filename = "simple_model_real_data_result_%s.h5"%runname
 print('filename:',filename)
 
 ### Grid Setting
 nCores = 32
-Nzeta = 100 # Previously 75
+Nzeta = 100
 Nlbd = 200
-Nmass = 150 # Previously 100
+Nmass = 150
 Nz = 100
 alpha = 0.001
 
@@ -437,7 +437,6 @@ if quick_fit:
 if run_mcmc:
     print('Starting MCMC')
     pool = Pool(processes=nCores)              # start 64 worker processes
-    filename = "simple_model_fake_data_result.h5"
     backend = emcee.backends.HDFBackend(filename)
     backend.reset(walkers, ndims)
     sampler = emcee.EnsembleSampler(walkers, ndims, logposterior, args=[indices], backend=backend, pool=pool)
@@ -450,19 +449,21 @@ if run_mcmc:
     
     flat_samples = sampler.flatchain
     np.save(filename[:-2], flat_samples)
+    # Second place where the data is saved (precaution)
     
-    fig, axes = plt.subplots(ndims, figsize=(10, 7), sharex=True)
-    samples = flat_samples
-    for i in range(ndims):
-        ax = axes[i]
-        ax.plot(samples[:, i], "k", alpha=0.3)
-        ax.set_xlim(0, len(samples))
-        #ax.set_ylabel(labels[i])
-        ax.yaxis.set_label_coords(-0.1, 0.5)
-    axes[-1].set_xlabel("step number");
-    fig.savefig('mcmc_chain_simple_model.png',dpi=75)
-    plt.clf()
-    
-    fig = corner.corner(flat_samples, truths=theta_true, show_titles = True);
-    fig.savefig('mcmc_corner_simple_model.png',dpi=75)
-    plt.clf()
+    # For future plotting
+    #fig, axes = plt.subplots(ndims, figsize=(10, 7), sharex=True)
+    #samples = flat_samples
+    #for i in range(ndims):
+    #    ax = axes[i]
+    #    ax.plot(samples[:, i], "k", alpha=0.3)
+    #    ax.set_xlim(0, len(samples))
+    #    #ax.set_ylabel(labels[i])
+    #    ax.yaxis.set_label_coords(-0.1, 0.5)
+    #axes[-1].set_xlabel("step number");
+    #fig.savefig('mcmc_chain_simple_model.png',dpi=75)
+    #plt.clf()
+    #
+    #fig = corner.corner(flat_samples, truths=theta_true, show_titles = True);
+    #fig.savefig('mcmc_corner_simple_model.png',dpi=75)
+    #plt.clf()

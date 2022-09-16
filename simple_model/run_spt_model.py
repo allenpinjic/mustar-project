@@ -283,14 +283,15 @@ header()
 debug = False
 run_mcmc = True
 quick_fit = True
-is_real_data = False
+is_real_data = True
 
 ### Parameter to name it
-runname = "test"
-version = 0
-filename = "{}_{:02d}".format(runname, version)
+runname = "sept_16"
+# Name should indicate a) fake or real data b) the month and day of the run
+filename = "spt_model_real_data_result_%s.h5"%runname
 print('filename:',filename)
-infile = 'fake_data_Jul4.csv'
+#infile = 'fake_data_Jul4.csv'
+
 
 ### Grid Setting
 nCores = 16
@@ -432,7 +433,6 @@ if quick_fit:
 if run_mcmc:
     print('Starting MCMC')
     pool = Pool(processes=nCores)              # start 64 worker processes
-    filename = "spt_model_fake_data_result.h5"
     backend = emcee.backends.HDFBackend(filename)
     backend.reset(walkers, ndims)
     sampler = emcee.EnsembleSampler(walkers, ndims, logposterior, args=[indices], backend=backend, pool=pool)
@@ -445,6 +445,7 @@ if run_mcmc:
     
     flat_samples = sampler.flatchain
     np.save(filename, flat_samples)
+    # Second place where the data is saved (precaution)
     
     fig, axes = plt.subplots(ndims, figsize=(10, 7), sharex=True)
     samples = flat_samples

@@ -267,15 +267,15 @@ header()
 #### Parameter to set
 debug = False
 run_mcmc = True
-quick_fit = False
-is_real_data = False
+quick_fit = True
+is_real_data = True
 
 ### Parameter to name it
-runname = "test"
-version = 0
-filename = "{}_{:02d}".format(runname, version)
+runname = "insertDate"
+# Name should indicate a) fake or real data b) the month and day of the run
+filename = "very_simple_model_fake_data_result_%s.h5"%runname
 print('filename:',filename)
-infile = 'fake_data_Jul4.csv'
+#infile = 'fake_data_Jul4.csv'
 
 ### Grid Setting
 nCores = 8
