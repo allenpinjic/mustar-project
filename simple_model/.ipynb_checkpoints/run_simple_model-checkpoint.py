@@ -300,6 +300,7 @@ runname = "sept_15"
 # Name should indicate a) fake or real data b) the month and day of the run
 filename = "simple_model_real_data_result_%s.h5"%runname
 print('filename:',filename)
+infile = 'fake_data_Jul4.csv'
 
 ### Grid Setting
 nCores = 32

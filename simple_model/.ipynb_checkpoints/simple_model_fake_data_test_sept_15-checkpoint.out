@@ -1,0 +1,19 @@
+
+
+--------------------------------------------------
+	 Scaling Relation MCMC Fitting Code
+
+
+Today is: 2022-09-16 10:18:45.127933
+--------------------------------------------------
+filename: simple_model_real_data_result_sept_15.h5
+Number of points 1318
+Simple Model took 0.3 seconds
+Maximum likelihood estimates:
+Albd = 74.965
+Blbd = 1.026
+Clbd = 0.182
+Scatter_lbd = 0.005
+rho: 1.000
+lps: [2.9244339767738996, 2.948057053893533, 2.9236357312019376, 3.222216549873348, 3.242066383413687, 4.909844690889358, 3.373427086931403, 5.154877192931089, inf, inf, inf]
+Starting MCMC
