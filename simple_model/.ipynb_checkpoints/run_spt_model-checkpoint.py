@@ -283,20 +283,20 @@ header()
 debug = False
 run_mcmc = True
 quick_fit = True
-is_real_data = True
+is_real_data = False
 
 ### Parameter to name it
-runname = "sept_16"
+runname = "sept_23"
 # Name should indicate a) fake or real data b) the month and day of the run
-filename = "spt_model_real_data_result_%s.h5"%runname
+filename = "spt_model_fake_data_result%s.h5"%runname
 print('filename:',filename)
-#infile = 'fake_data_Jul4.csv'
+infile = 'fake_data_Jul4.csv'
 
 
 ### Grid Setting
-nCores = 16
-Nzeta = 100 # Previously 75
-Nlbd = 200
+nCores = 32
+Nzeta = 50 # Previously 100
+Nlbd = 100 # Previously 200
 Nmass = 100 # Previously 100
 Nz = 100
 alpha = 0.001
