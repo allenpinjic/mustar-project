@@ -393,6 +393,7 @@ if debug:
     sel = np.random.randint(len(redshift), size=100, dtype=int)
     argslist = [sel]
     logposterior(theta_true, sel)
+    print("The value of the logposterior using theta_true and sel: ", logposterior(theta_true, sel))
 
 if quick_fit:
     start = time.time()
