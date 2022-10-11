@@ -187,6 +187,7 @@ def logNormal_variance(mu,std):
    
 def logposterior(theta, indices):
     lp = logprior(theta)
+    # print("This is the value of the logprior : ", lp)
     if not np.isfinite(lp):
         return -np.inf, -np.inf
     
@@ -376,15 +377,15 @@ lbd_indices_vec = np.array([slice_array(pi, alpha=alpha) for pi in prob_lbd_hat_
 zeta_indices_vec = np.array([slice_array(pi, alpha=alpha) for pi in prob_chisi_vec])
 
 if debug:
-    print("This is prob_lbd_hat_vec shape :", prob_lbd_hat_vec.shape)
-    print("This is lbd_indices_vec:", lbd_indices_vec[:3])
-    print("This is zeta_indices_vec shape:", zeta_indices_vec.shape)
+    print("This is prob_lbd_hat_vec shape: ", prob_lbd_hat_vec.shape)
+    print("This is lbd_indices_vec: ", lbd_indices_vec[:3])
+    print("This is zeta_indices_vec shape: ", zeta_indices_vec.shape)
     
 if debug:
     theta_true = [5.24, 1.534, 0.465, 0.161, 76.9, 1.02, 0.29, 0.16, 0.8]
     indices = np.arange(len(mass))
-    print('Test LogPosterior')
-    print(logposterior(theta_true, indices))
+    print('Testing LogPosterior')
+    print("The value of the logposterior: ", logposterior(theta_true, indices))
     
 if debug:
     guess = (np.array(theta_true)[:, np.newaxis]*(1.+0.01*np.random.normal(size=(ndims,walkers)))).T

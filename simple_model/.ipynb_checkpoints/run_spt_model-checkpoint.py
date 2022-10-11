@@ -288,7 +288,7 @@ is_real_data = False
 ### Parameter to name it
 runname = "sept_23"
 # Name should indicate a) fake or real data b) the month and day of the run
-filename = "spt_model_fake_data_result%s.h5"%runname
+filename = "spt_model_fake_data_result_%s.h5"%runname
 print('filename:',filename)
 infile = 'fake_data_Jul4.csv'
 
