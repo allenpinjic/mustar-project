@@ -350,7 +350,6 @@ if is_real_data:
     _lambda = np.array(data['LAMBDA_CHISQ'])[ix]
     _lambda_error = np.array(data['LAMBDA_CHISQ_E'])[ix]
     redshift = np.array(data['REDSHIFT'])[ix]
-    mass = np.array(data['M500']*1e14)[ix]
     
 # global variables
 M0 = 3e14
