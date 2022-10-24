@@ -80,6 +80,15 @@ Lambda_Priors = {'A_lambda':[76.9, 3*8.2], 'B_lambda':[1.020, 5*0.080],'C_lambda
 
 lambda_theta_values = ['A_lambda', 'B_lambda', 'C_lambda', 'scatter_lambda']
 
+# Erasing the addition of the upper and lower bounds from the library since the
+# the set_prior_sze and set_prior_lambda functions are not expceting more than two values
+
+# For now both the sz and lambda scatters have the same lower and upper bounds
+scatter_lower_bound = 0.02
+scatter_upper_bound = 0.50
+
+def set_uniform_prior(param, lowerBound, upperBound):
+    return np.where((param > lowerBound) & (param < upperBound), param, np.inf)
 
 def set_gaussian_prior(param, mu, sigma):
     return -0.5*((param - mu)/(sigma))**2
@@ -97,6 +106,7 @@ def set_prior_sze(theta_values):
         lp += np.where(np.abs(result)>9., -np.inf, result)
         # outside a range of six sigmas (six standard deviations)
     # set prior to 1 (log prior to 0) if in the range and zero (-inf) outside the range
+    lp += set_uniform_prior(theta_values[-1], scatter_lower_bound, scatter_upper_bound)
     lp = 0. if (theta_values[-1] > 0) else -np.inf
     return lp
 
@@ -114,6 +124,7 @@ def set_prior_lambda(theta_values):
         # outside a range of six sigmas (six standard deviations)
        
     # set prior to 1 (log prior to 0) if in the range and zero (-inf) outside the range
+    lp += set_uniform_prior(theta_values[-1], scatter_lower_bound, scatter_upper_bound)
     lp = 0. if (theta_values[-1] > 0) else -np.inf
     return lp
 
@@ -127,7 +138,8 @@ def logprior(theta):
     lp_lambda = set_prior_lambda([A_lambda, B_lambda, C_lambda, scatter_lambda])
     lp_sze = set_prior_sze([A_sze, B_sze, C_sze, scatter_sze])
     
-    lp = 0. if ((rho > -1.) and (rho < 1)) else -np.inf
+    #lp = 0. if ((rho > -1.) and (rho < 1)) else -np.inf
+    lp = set_uniform_prior(rho, -0.78, 1)
     return lp + lp_lambda + lp_sze
 
 def ln_zeta_given_M(theta_sze,M,z):
@@ -273,12 +285,12 @@ is_real_data = True
 ### Parameter to name it
 runname = "insertDate"
 # Name should indicate a) fake or real data b) the month and day of the run
-filename = "very_simple_model_fake_data_result_%s.h5"%runname
+filename = "very_simple_model_real_data_result_%s.h5"%runname
 print('filename:',filename)
 infile = 'fake_data_Jul4.csv'
 
 ### Grid Setting
-nCores = 8
+nCores = 32
 Nzeta = 75 # Previously 75
 Nlbd = 150
 Nmass = 100 # Previously 100
@@ -434,9 +446,9 @@ if run_mcmc:
         #ax.set_ylabel(labels[i])
         ax.yaxis.set_label_coords(-0.1, 0.5)
     axes[-1].set_xlabel("step number");
-    fig.savefig('mcmc_chain_very_simple_model.png',dpi=75)
+    fig.savefig('mcmc_chain_very_simple_model_real_data.png',dpi=75)
     plt.clf()
     
     fig = corner.corner(flat_samples, truths=theta_true, show_titles = True);
-    fig.savefig('mcmc_corner_very_simple_model.png',dpi=75)
+    fig.savefig('mcmc_corner_very_simple_model_real_data_model.png',dpi=75)
     plt.clf()

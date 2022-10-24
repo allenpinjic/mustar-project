@@ -469,9 +469,9 @@ if run_mcmc:
         #ax.set_ylabel(labels[i])
         ax.yaxis.set_label_coords(-0.1, 0.5)
     axes[-1].set_xlabel("step number");
-    fig.savefig('mcmc_chain_spt_model.png',dpi=75)
+    fig.savefig('mcmc_chain_spt_model_real_data.png',dpi=75)s
     plt.clf()
     
     fig = corner.corner(flat_samples, truths=theta_true, show_titles = True);
-    fig.savefig('mcmc_corner_spt_model.png',dpi=75)
+    fig.savefig('mcmc_corner_spt_model_real_data_model.png',dpi=75)
     plt.clf()
