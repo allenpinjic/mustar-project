@@ -44,7 +44,7 @@ def log_likelihood_simple(theta, indices, eps=1e-9):
     probs = []
     for ix in indices:
         probs.append(_likelihood_simple(theta, ix))
-        break
+        #break
     
     # missing a normalization factor
     p = np.array(probs)
@@ -310,7 +310,7 @@ quick_fit = True
 is_real_data = True
 
 ### Parameter to name it
-runname = "oct_20_B"
+runname = "oct_20_WB"
 # Name should indicate a) fake or real data b) the month and day of the run
 filename = "simple_model_real_data_test_result_%s.h5"%runname
 print('filename:',filename)

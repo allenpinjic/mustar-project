@@ -283,7 +283,7 @@ quick_fit = True
 is_real_data = True
 
 ### Parameter to name it
-runname = "insertDate"
+runname = "oct_20_1.2"
 # Name should indicate a) fake or real data b) the month and day of the run
 filename = "very_simple_model_real_data_result_%s.h5"%runname
 print('filename:',filename)
@@ -295,13 +295,13 @@ Nzeta = 75 # Previously 75
 Nlbd = 150
 Nmass = 100 # Previously 100
 Nz = 100
-alpha = 0.0001
+alpha = 0.001 #(ORIGINALLY) 0.0001
 
 ### MCMC Setup
 theta_true = [5.24, 1.534, 0.465, 0.161, 76.9, 1.02, 0.29, 0.16, 0.8]
 Nburnin = 1000 # number of burn-in samples
-Nsamples = 5000 # number of final posterior samples
-walkers = 32
+Nsamples = 50000 # number of final posterior samples (ORIGINALLY 5000)
+walkers = 64 #(ORIGINALLY 32)
 ndims = len(theta_true)
 guess = (np.array(theta_true)[:, np.newaxis]*(1.+0.01*np.random.normal(size=(ndims,walkers)))).T
 
@@ -446,9 +446,9 @@ if run_mcmc:
         #ax.set_ylabel(labels[i])
         ax.yaxis.set_label_coords(-0.1, 0.5)
     axes[-1].set_xlabel("step number");
-    fig.savefig('mcmc_chain_very_simple_model_real_data.png',dpi=75)
+    fig.savefig('mcmc_chain_very_simple_model_real_data_1.2.png',dpi=75)
     plt.clf()
     
     fig = corner.corner(flat_samples, truths=theta_true, show_titles = True);
-    fig.savefig('mcmc_corner_very_simple_model_real_data_model.png',dpi=75)
+    fig.savefig('mcmc_corner_very_simple_model_real_data_model_1.2.png',dpi=75)
     plt.clf()
