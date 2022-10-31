@@ -152,11 +152,11 @@ def set_prior_lambda(theta_values):
     rhomin = -1.
     rhomax = 1.
     
-    for i, prior_name in enumerate(['A_lambda', 'B_lambda', 'C_lambda', 'scatter_lambda']):
-        mean, error = Lambda_Priors[prior_name]
-        param = theta_values[i]
-        result = set_gaussian_prior(param, mean, error)
-        lp += np.where(np.abs(result)>9., -np.inf, result)
+    #for i, prior_name in enumerate(['A_lambda', 'B_lambda', 'C_lambda', 'scatter_lambda']):
+    #    mean, error = Lambda_Priors[prior_name]
+    #    param = theta_values[i]
+    #    result = set_gaussian_prior(param, mean, error)
+    #    lp += np.where(np.abs(result)>9., -np.inf, result)
         # outside a range of six sigmas (six standard deviations)
        
     lp += set_uniform_prior(theta_values[-1], scatter_lower_bound, scatter_upper_bound)
@@ -296,12 +296,12 @@ header()
 debug = False
 run_mcmc = True
 quick_fit = True
-is_real_data = True
+is_real_data = False
 
 ### Parameter to name it
-runname = "oct_20"
+runname = "oct_28"
 # Name should indicate a) fake or real data b) the month and day of the run
-filename = "spt_model_real_data_test_result_%s.h5"%runname
+filename = "spt_model_fake_data_test_result_%s.h5"%runname
 print('filename:',filename)
 infile = 'fake_data_Jul4.csv'
 
@@ -469,9 +469,9 @@ if run_mcmc:
         #ax.set_ylabel(labels[i])
         ax.yaxis.set_label_coords(-0.1, 0.5)
     axes[-1].set_xlabel("step number");
-    fig.savefig('mcmc_chain_spt_model_real_data.png',dpi=75)s
+    fig.savefig('mcmc_chain_spt_model_fake_data_oct_28.png',dpi=75)
     plt.clf()
     
     fig = corner.corner(flat_samples, truths=theta_true, show_titles = True);
-    fig.savefig('mcmc_corner_spt_model_real_data_model.png',dpi=75)
+    fig.savefig('mcmc_corner_spt_model_fake_data_model_oct_28.png',dpi=75)
     plt.clf()

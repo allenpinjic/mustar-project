@@ -202,7 +202,6 @@ def logposterior(theta, indices):
     lp = logprior(theta)
     if not np.isfinite(lp):
         return -np.inf, -np.inf
-    
     ll = log_likelihood_simple(theta, indices)# + lp
     if not np.isfinite(ll):
         return lp, -np.inf
@@ -466,7 +465,6 @@ if run_mcmc:
     np.save(filename[:-2], flat_samples)
     # Second place where the data is saved (precaution)
     
-    # For future plotting
     #fig, axes = plt.subplots(ndims, figsize=(10, 7), sharex=True)
     #samples = flat_samples
     #for i in range(ndims):

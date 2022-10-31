@@ -39,7 +39,6 @@ cosmology.setCosmology('WMAP9')
 ###############################################################################
 
 def log_likelihood(theta, indices, eps=1e-9):
-    # defining variables
     probs = []
     for ix in indices:
         probs.append(_likelihood(theta, ix))
@@ -160,8 +159,8 @@ def set_prior_lambda(theta_values):
         # outside a range of six sigmas (six standard deviations)
        
     lp += set_uniform_prior(theta_values[-1], scatter_lower_bound, scatter_upper_bound)
-     # set prior to 1 (log prior to 0) if in the range and zero (-inf) outside the range
     lp += 0. if (theta_values[-1] > 0) else -np.inf
+    # set prior to 1 (log prior to 0) if in the range and zero (-inf) outside the range
     return lp
 
 def logprior(theta):
@@ -172,7 +171,6 @@ def logprior(theta):
     lp_lambda = set_prior_lambda([A_lambda, B_lambda, C_lambda, scatter_lambda])
     lp_sze = set_prior_sze([A_sze, B_sze, C_sze, scatter_sze])
     
-    #lp = 0. if ((rho >= -1.) and (rho <= 1.)) else -np.inf
     lp = set_uniform_prior(rho, -0.78, 1)
     return lp + lp_lambda + lp_sze
 
@@ -296,12 +294,12 @@ header()
 debug = False
 run_mcmc = True
 quick_fit = True
-is_real_data = True
+is_real_data = False
 
 ### Parameter to name it
-runname = "oct_20"
+runname = "oct_28"
 # Name should indicate a) fake or real data b) the month and day of the run
-filename = "spt_model_real_data_test_result_%s.h5"%runname
+filename = "spt_model_fake_data_test_result_%s.h5"%runname
 print('filename:',filename)
 infile = 'fake_data_Jul4.csv'
 
@@ -469,9 +467,9 @@ if run_mcmc:
         #ax.set_ylabel(labels[i])
         ax.yaxis.set_label_coords(-0.1, 0.5)
     axes[-1].set_xlabel("step number");
-    fig.savefig('mcmc_chain_spt_model_real_data.png',dpi=75)s
+    fig.savefig('mcmc_chain_spt_model_fake_data_oct_28.png',dpi=75)
     plt.clf()
     
     fig = corner.corner(flat_samples, truths=theta_true, show_titles = True);
-    fig.savefig('mcmc_corner_spt_model_real_data_model.png',dpi=75)
+    fig.savefig('mcmc_corner_spt_model_fake_data_model_oct_28.png',dpi=75)
     plt.clf()

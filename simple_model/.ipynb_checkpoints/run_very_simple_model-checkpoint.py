@@ -80,16 +80,6 @@ Lambda_Priors = {'A_lambda':[76.9, 3*8.2], 'B_lambda':[1.020, 5*0.080],'C_lambda
 
 lambda_theta_values = ['A_lambda', 'B_lambda', 'C_lambda', 'scatter_lambda']
 
-# Erasing the addition of the upper and lower bounds from the library since the
-# the set_prior_sze and set_prior_lambda functions are not expceting more than two values
-
-# For now both the sz and lambda scatters have the same lower and upper bounds
-scatter_lower_bound = 0.02
-scatter_upper_bound = 0.50
-
-def set_uniform_prior(param, lowerBound, upperBound):
-    return np.where((param > lowerBound) & (param < upperBound), param, np.inf)
-
 def set_gaussian_prior(param, mu, sigma):
     return -0.5*((param - mu)/(sigma))**2
 
@@ -106,7 +96,6 @@ def set_prior_sze(theta_values):
         lp += np.where(np.abs(result)>9., -np.inf, result)
         # outside a range of six sigmas (six standard deviations)
     # set prior to 1 (log prior to 0) if in the range and zero (-inf) outside the range
-    lp += set_uniform_prior(theta_values[-1], scatter_lower_bound, scatter_upper_bound)
     lp = 0. if (theta_values[-1] > 0) else -np.inf
     return lp
 
@@ -124,7 +113,6 @@ def set_prior_lambda(theta_values):
         # outside a range of six sigmas (six standard deviations)
        
     # set prior to 1 (log prior to 0) if in the range and zero (-inf) outside the range
-    lp += set_uniform_prior(theta_values[-1], scatter_lower_bound, scatter_upper_bound)
     lp = 0. if (theta_values[-1] > 0) else -np.inf
     return lp
 
@@ -138,8 +126,7 @@ def logprior(theta):
     lp_lambda = set_prior_lambda([A_lambda, B_lambda, C_lambda, scatter_lambda])
     lp_sze = set_prior_sze([A_sze, B_sze, C_sze, scatter_sze])
     
-    #lp = 0. if ((rho > -1.) and (rho < 1)) else -np.inf
-    lp = set_uniform_prior(rho, -0.78, 1)
+    lp = 0. if ((rho > -1.) and (rho < 1)) else -np.inf
     return lp + lp_lambda + lp_sze
 
 def ln_zeta_given_M(theta_sze,M,z):
@@ -280,12 +267,12 @@ header()
 debug = False
 run_mcmc = True
 quick_fit = True
-is_real_data = True
+is_real_data = False
 
 ### Parameter to name it
-runname = "oct_20_1.2"
+runname = ""
 # Name should indicate a) fake or real data b) the month and day of the run
-filename = "very_simple_model_real_data_result_%s.h5"%runname
+filename = "very_simple_model_real_data_testing%s.h5"%runname
 print('filename:',filename)
 infile = 'fake_data_Jul4.csv'
 
@@ -295,7 +282,7 @@ Nzeta = 75 # Previously 75
 Nlbd = 150
 Nmass = 100 # Previously 100
 Nz = 100
-alpha = 0.001 #(ORIGINALLY) 0.0001
+alpha = 0.0001 #(ORIGINALLY) 0.0001
 
 ### MCMC Setup
 theta_true = [5.24, 1.534, 0.465, 0.161, 76.9, 1.02, 0.29, 0.16, 0.8]
