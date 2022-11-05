@@ -1,8 +1,0 @@
-nohup: ignoring input
-/global/project/projectdirs/des/apinjic/repos/mustar-summer-project/simple_model/run_spt_model.py:10: DeprecationWarning: Importing display from IPython.core.display is deprecated since IPython 7.14, please import from IPython display
-  from IPython.core.display import display, HTML
-Exception ignored in: <function Pool.__del__ at 0x15542fbf2550>
-Traceback (most recent call last):
-  File "/global/homes/a/apinjic/.conda/envs/myenv/lib/python3.9/multiprocessing/pool.py", line 268, in __del__
-  File "/global/homes/a/apinjic/.conda/envs/myenv/lib/python3.9/multiprocessing/queues.py", line 372, in put
-AttributeError: 'NoneType' object has no attribute 'dumps'

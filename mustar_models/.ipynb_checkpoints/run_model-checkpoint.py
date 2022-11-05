@@ -94,7 +94,7 @@ if very_simple_model:
         probs = []
         for ix in indices:
             probs.append(log_likelihood_additional(theta, ix))
-            break
+
         p = np.array(probs)
         log_p = np.log(p)
         log_p = np.where(np.isnan(log_p), -np.inf, log_p)
@@ -187,7 +187,6 @@ elif simple_model:
         probs = []
         for ix in indices:
             probs.append(log_likelihood_additional(theta, ix))
-            break
         
         # missing a normalization factor
         p = np.array(probs)
