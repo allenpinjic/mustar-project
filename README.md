@@ -1,4 +1,4 @@
-# Mu-Star Research Project
+# MuStar Research Project
 
 ## Description
 This is a research project that I am working on with graduate student Johnny Esteves 
