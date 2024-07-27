@@ -75,7 +75,7 @@ Simplified Linear Model<sup>3</sup>
 <p align="center">
 <img width="206" alt="image" src="https://github.com/user-attachments/assets/15feb096-bac7-4c83-bd52-e15ed6b39c72">
 </p>
-<p align "center">
+<p align="center">
 Figure 3. Linear prediction for the values of the specified mass proxies (MuStar μ<sup>*</sup> and SZ signal ζ) and using the log mass of a cluster
 </p>
 <br>
