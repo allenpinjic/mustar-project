@@ -1,6 +1,6 @@
 <br />
 <div align="center">
-<h1 align="center">MuStar Research Project</h1>
+<h1 align="center">Stellar-to-Halo Mass Relation of DES/SPT Clusters</h1>
   <h3 align="center">
     Defining the scalar mass relations between MuStar and the masses of galaxy clusters
 from data samples selected by the South Pole Telescope (SPT)
